@@ -1,0 +1,15 @@
+main -----------o-------------------o------------------->  sistema funcionando en PRODUCCION
+                 \                 /
+                  release/v1.0 ---/
+                 /
+develop --------o------o------o-------------------------> proyect manager 
+                        \
+                         feature/setup-base	rama instalacion basica del proyecto DEPENDENCIAS , configuraciones , key seguridad 		nuevas funcionalidade
+			|
+			|
+			\feature/mauricio      rama de mauricio DONDE MAURICIO VA A TRABAJAR 
+
+			rama prueba
+
+                   
+              
