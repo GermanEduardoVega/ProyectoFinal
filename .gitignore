@@ -1,0 +1,42 @@
+# --- Estructura de Proyecto ---
+# Ignorar binarios y compilados de Gradle/Maven
+.gradle
+build/
+bin/
+out/
+target/
+
+# --- Seguridad (CRÍTICO) ---
+# No subir nunca las credenciales 
+**/src/main/resources/application.properties
+.env
+*.log
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iws
+*.iml
+*.ipr
+atlassian-ide-plugin.xml
+
+# --- VS Code ---
+.vscode/
+
+# --- Otros Editores ---
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# --- Reglas de Rescate (Mantener wrappers) ---
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
