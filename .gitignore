@@ -11,6 +11,7 @@ target/
 **/src/main/resources/application.properties
 .env
 *.log
+LOG_PROGRESO*.md
 
 # --- IntelliJ IDEA ---
 .idea/
