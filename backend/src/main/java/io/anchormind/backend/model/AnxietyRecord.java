@@ -1,5 +1,6 @@
 package io.anchormind.backend.model;
 
+import io.anchormind.backend.model.entity.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -32,9 +33,14 @@ public class AnxietyRecord {
     @Column(columnDefinition = "TEXT")
     private String aiResponseJson;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @PrePersist
     protected void onCreate() {
         this.timeStamp = LocalDateTime.now();
     }
+
 
 }

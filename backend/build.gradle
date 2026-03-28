@@ -25,6 +25,11 @@ repositories {
 }
 
 dependencies {
+	// Flyway Core para la gestión de migraciones
+	implementation 'org.flywaydb:flyway-core'
+	// Específico para PostgreSQL (necesario en versiones recientes)
+	runtimeOnly 'org.flywaydb:flyway-database-postgresql'
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'

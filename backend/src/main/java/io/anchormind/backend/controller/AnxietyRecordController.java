@@ -22,37 +22,14 @@ public class    AnxietyRecordController {
 
     // POST: Para recibir un nuevo registro desde el Front
     @PostMapping
-        public AnxietyRecord createRecord(@RequestBody AnxietyRecord record) {
-
-
-        // 1. Llamamos a la IA pasándole el texto libre
-        AIAnalysisResponse aiAnalysis = (AIAnalysisResponse) aiService.getAnalysisFromAI(record.getRawInput());
-        // 2. Por ahora, guardamos el resultado de la IA en el campo JSON
-        //record.setAiResponseJson(aiResult);
-
-        if (aiAnalysis != null) {
-            record.setAnxietyLevel(aiAnalysis.getAnxietyLevel());
-            record.setTriggerIdentified(aiAnalysis.getTriggerIdentified());
-            record.setTechnique(aiAnalysis.getTechnique());
-            record.setApplicability(aiAnalysis.getApplicability());
-
-            // OPCIÓN RECOMENDADA: Guardá un resumen de todo el análisis en el campo JSON
-            String resumen = String.format(
-                    "Nivel: %d | Gatillo: %s | Técnica: %s",
-                    aiAnalysis.getAnxietyLevel(),
-                    aiAnalysis.getTriggerIdentified(),
-                    aiAnalysis.getTechnique()
-            );
-            record.setAiResponseJson(resumen);
-        }
-        // 3. Guardamos en la DB
-        return repository.save(record);
+    public AnxietyRecord createRecord(@RequestBody AnxietyRecord record,@RequestParam String username) {
+        // 1. Llamamos a la IA pasándole el texto libre y el username
+        return aiService.analyzeAndSaveForUser(record.getRawInput(), username);
     }
-
 
     // GET: Para ver todos los registros que hay en la base de datos
     @GetMapping
-        public List<AnxietyRecord> getAllRecords() {
+    public List<AnxietyRecord> getAllRecords() {
         return repository.findAll();
     }
 }
