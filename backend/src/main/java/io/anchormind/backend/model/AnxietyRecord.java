@@ -28,9 +28,14 @@ public class AnxietyRecord {
     private String technique; // Técnica (inferido por la IA)
     @Column(name = "aplicability", length = 1000)
     private String applicability; // Aplicabilidad (inferido por la IA)
+    @Column(name = "awareness_message", columnDefinition = "TEXT")
+    private String awarenessMessage;
+    // Para el array action_steps (TEXT[])
+    @Column(name = "action_steps", columnDefinition = "text[]")
+    private String[] actionSteps;
 
     /*** Aquí guardaremos la respuesta de la IA como un String JSON por ahora***/
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "ai_response_json",columnDefinition = "TEXT")
     private String aiResponseJson;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Optional;
 
-@Configuration
+//@Configuration
 public class UserTestRunner {
     @Bean
     CommandLineRunner commandLineRunner(UserRepository userRepository) {

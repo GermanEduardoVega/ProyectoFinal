@@ -27,7 +27,7 @@ repositories {
 dependencies {
 	// Flyway Core y soporte para Postgres (ambos como implementation)
 	implementation 'org.flywaydb:flyway-core:10.10.0'
-	implementation 'org.flywaydb:flyway-database-postgresql:10.10.0'
+	implementation 'org.flywaydb:flyway-database-postgresql'
 
 	// El driver de Postgres que ya tienes
 	runtimeOnly 'org.postgresql:postgresql'

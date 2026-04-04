@@ -32,4 +32,8 @@ public class User {
     // Regla de desarrollo: Baja Lógica
     @Column(nullable = false)
     private Boolean active = true;
+
+    @ManyToOne(fetch = FetchType.LAZY) //No queremos que cada vez que busques un usuario, Hibernate traiga todos los datos de la clínica de forma obligatoria. Solo los traerá si haces user.getClinic(). Esto optimiza la memoria de tu backend.
+    @JoinColumn(name = "clinic_id")
+    private Clinic clinic;
 }
