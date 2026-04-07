@@ -1,4 +1,4 @@
-package io.anchormind.backend.model;
+package io.anchormind.backend.model.entity;
 
 import io.anchormind.backend.model.entity.User;
 import jakarta.persistence.*;
@@ -35,7 +35,7 @@ public class AnxietyRecord {
     private String[] actionSteps;
 
     /*** Aquí guardaremos la respuesta de la IA como un String JSON por ahora***/
-    @Column(name = "ai_response_json",columnDefinition = "TEXT")
+    @Column(name = "ai_response_json", columnDefinition = "TEXT")
     private String aiResponseJson;
 
     @ManyToOne(fetch = FetchType.LAZY)

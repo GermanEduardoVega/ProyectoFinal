@@ -22,7 +22,8 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Enumerated(EnumType.STRING)    //sugiere que el campo se almacene como un String es decir un VARCHAR y no como un INTEGER
+    @Enumerated(EnumType.STRING)
+    //sugiere que el campo se almacene como un String es decir un VARCHAR y no como un INTEGER
     @Column(nullable = false)
     private Role role;
 
@@ -33,7 +34,8 @@ public class User {
     @Column(nullable = false)
     private Boolean active = true;
 
-    @ManyToOne(fetch = FetchType.LAZY) //No queremos que cada vez que busques un usuario, Hibernate traiga todos los datos de la clínica de forma obligatoria. Solo los traerá si haces user.getClinic(). Esto optimiza la memoria de tu backend.
+    @ManyToOne(fetch = FetchType.LAZY)
+    //No queremos que cada vez que busques un usuario, Hibernate traiga todos los datos de la clínica de forma obligatoria. Solo los traerá si haces user.getClinic(). Esto optimiza la memoria de tu backend.
     @JoinColumn(name = "clinic_id")
     private Clinic clinic;
 }

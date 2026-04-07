@@ -1,35 +1,38 @@
 package io.anchormind.backend.controller;
 
-import io.anchormind.backend.dto.AIAnalysisResponse;
-import io.anchormind.backend.model.AnxietyRecord;
-import io.anchormind.backend.repository.AnxietyRecordRepository;
-//import io.anchormind.backend.service.AIService;
+import io.anchormind.backend.dto.AnxietyRecordDTO;
 import io.anchormind.backend.service.AIServiceR;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.anchormind.backend.service.AnxietyRecordService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/records")// La URL base
-public class    AnxietyRecordController {
+@RequiredArgsConstructor
+public class AnxietyRecordController {
 
-    @Autowired
-    private AnxietyRecordRepository repository;
-
-    @Autowired
-    private AIServiceR aiService;    // Inyectamos el servicio de IA
+    // Marcamos como 'final' para que RequiredArgsConstructor los inyecte automáticamente
+    private final AnxietyRecordService recordService; // Final = Inmutable
+    private final AIServiceR aiService;
 
     // POST: Para recibir un nuevo registro desde el Front
     @PostMapping
-    public AnxietyRecord createRecord(@RequestBody AnxietyRecord record,@RequestParam String username) {
-        // 1. Llamamos a la IA pasándole el texto libre y el username
-        return aiService.analyzeAndSaveForUser(record.getRawInput(), username);
+    public ResponseEntity<AnxietyRecordDTO> createRecord(
+            @RequestBody String rawInput,
+            @RequestParam String username) {
+        // Llamamos al servicio de IA (que internamente guarda y devuelve el DTO)
+        AnxietyRecordDTO savedRecord = aiService.analyzeAndSaveForUser(rawInput, username);
+        return ResponseEntity.ok(savedRecord);
     }
 
-    // GET: Para ver todos los registros que hay en la base de datos
+
     @GetMapping
-    public List<AnxietyRecord> getAllRecords() {
-        return repository.findAll();
+    public ResponseEntity<List<AnxietyRecordDTO>> getAllRecords() {
+        List<AnxietyRecordDTO> records = recordService.findAllRecords();
+
+        return ResponseEntity.ok(records);
     }
 }

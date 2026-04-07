@@ -13,4 +13,12 @@ public class AIAnalysisResponse {
     private String technique;
     @JsonProperty("applicability")
     private String applicability;
+    @JsonProperty("awarenessMessage")
+    private String awarenessMessage;
+    @JsonProperty("actionSteps")
+    private String[] actionSteps;
+
+
+
+
 }
