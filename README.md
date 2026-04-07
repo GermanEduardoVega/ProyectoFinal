@@ -5,28 +5,28 @@ App para el proyecto final
 
 Plataforma integral diseñada para la gestión, seguimiento y análisis de episodios de ansiedad, utilizando modelos de procesamiento de lenguaje natural para brindar soporte personalizado y trazabilidad clínica.
 
-# 🚀 Estado del Proyecto: Fase 4 (Estructura Multi-Institucional & Integridad)
-El sistema ha madurado hacia una arquitectura profesional y versionada, permitiendo ahora la vinculación de usuarios a instituciones (Clínicas) y garantizando que el código Java y la base de datos PostgreSQL sean un espejo exacto gracias a procesos de migración controlados.
+# 🚀 Estado del Proyecto: Fase 5 (Lógica de Negocio & Desacoplamiento DTO)
+El sistema ha alcanzado una madurez arquitectónica superior mediante la implementación del patrón DTO (Data Transfer Objects) y la separación estricta de responsabilidades. Se ha eliminado la exposición de entidades JPA, garantizando transacciones seguras y respuestas de IA enriquecidas con protocolos de acción terapéutica.
 
 ### 🛠️ Stack Tecnológico
-* **Lenguaje:** Java 17
+* **Lenguaje:** Java 17(Uso de Records para inmutabilidad)
 * **Framework:** Spring Boot 3.4+ /4.0
-* **IA:** Google Gemini 3 Flash API (v1beta)
+* **IA:** Google Gemini 2.5 Flash API (v1beta)
 * **Base de Datos:** PostgreSQL 15+
 * **Migraciones:** Flyway (Database Version Control)
-* **Comunicación:** Spring WebFlux (WebClient)
-* **Persistencia:** Spring Data JPA + Hibernate (modo validate)
-* **Productividad:** Lombok (Uso intensivo de @Builder y @Data)
+* **Persistencia:**  Spring Data JPA + Hibernate (modo validate)
+* **Mapeo:** Arquitectura Manual de DTOs para control total de la carga perezosa (Lazy).
+* **Productividad:** Lombok (@RequiredArgsConstructor, @Data, @Getter)
 
 ---
 
-## 🧠 Arquitectura Institucional & Relacional
-El sistema implementa una jerarquía de datos expandida:
-1.  **Escalabilidad Clínica:** Introducción de la entidad Clinic. Los usuarios poseen una vinculación @ManyToOne (Lazy Loading) con instituciones.
-2.  **Persistencia Inmutable:**Migración del modelo automático a un sistema de control de versiones de base de datos con Flyway.
-3.  **Sincronización Java-SQL:** Mapeo exacto de campos técnicos (triggerIdentified, applicability, aiResponseJson) validados mediante Hibernate.
-4.  **Validación Relacional:** Integración física de llaves foráneas reales (clinic_id) para trazabilidad multi-inquilino.
+## 🧠 Arquitectura de Capas y Flujo de Datos
+El sistema implementa una Arquitectura Multicapa para garantizar el desacoplamiento:
 
+1.  **Capa de Presentación (REST Controllers):** Maneja únicamente DTOs. Inyección de dependencias por constructor para máxima testeabilidad.
+2.  **Capa de Servicio (Business Logic):**Orquestación de procesos. Uso de @Transactional para gestionar la persistencia y la hidratación de objetos relacionados.
+3.  **Capa de Dominio (Entities):** Modelos JPA que representan fielmente las tablas de PostgreSQL, protegidos tras la capa de servicio.
+4.  **Capa de Transferencia (DTOs/Records):**Objetos inmutables que definen el contrato de comunicación con el Frontend, evitando la recursión infinita y errores de sesión.
 ---
 
 ## 📋 Bitácora de Logros (Log de Progreso)
@@ -71,6 +71,25 @@ El sistema implementa una jerarquía de datos expandida:
 -   **Integridad de Datos:** No se permite la creación de tablas por parte de Hibernate. Cualquier cambio estructural debe realizarse mediante un nuevo script V3__...sql en Flyway.
 
 -   **Lazy Initialization:** El error LazyInitializationException detectado en esta fase confirma la necesidad de transicionar hacia el uso de DTOs (Records) para la transferencia de datos a la capa de presentación.
+
+### ✅ Fase 5: Lógica de Negocio & Desacoplamiento (Hito Completado)
+* **Implementación de Patrón DTO:** Creación de AnxietyRecordDTO, UserDTO y ClinicDTO utilizando Java 17 Records. Esto garantiza que los datos que viajan al cliente sean inmutables y seguros.
+
+* **Resolución de LazyInitializationException:** Se dominó el contexto transaccional para permitir la navegación por el grafo de objetos (Registro -> Usuario -> Clínica) sin perder la sesión de Hibernate.
+
+* **Enriquecimiento de Análisis de IA:** El prompt de Gemini se optimizó para devolver una estructura JSON compleja que incluye:
+
+- awarenessMessage: Mensaje de validación emocional.
+
+- actionSteps: Array de pasos técnicos (ej: técnica 5-4-3-2-1) para intervención inmediata.
+
+* **Refactorización de Controladores:** Migración hacia el uso de ResponseEntity y eliminación de inyecciones de campo (@Autowired) en favor de la inyección por constructor, siguiendo las mejores prácticas de Spring.
+
+* **Manejo de Tipos Complejos:** Sincronización exitosa de arrays de strings (text[]) de PostgreSQL con colecciones de Java para los pasos de acción.
+
+[!IMPORTANT]
+Logro Arquitectónico: El sistema ahora es "Type Safe". La base de datos puede evolucionar independientemente de la API pública gracias al mapeo manual de DTOs.
+
 ---
 
 ## ⚙️ Configuración para Desarrolladores
