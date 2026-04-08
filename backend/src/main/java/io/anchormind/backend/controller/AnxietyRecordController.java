@@ -18,6 +18,7 @@ public class AnxietyRecordController {
     private final AnxietyRecordService recordService; // Final = Inmutable
     private final AIServiceR aiService;
 
+
     // POST: Para recibir un nuevo registro desde el Front
     @PostMapping
     public ResponseEntity<AnxietyRecordDTO> createRecord(
@@ -28,11 +29,21 @@ public class AnxietyRecordController {
         return ResponseEntity.ok(savedRecord);
     }
 
-
+    // GET: Para obtener todos los registros
     @GetMapping
     public ResponseEntity<List<AnxietyRecordDTO>> getAllRecords() {
         List<AnxietyRecordDTO> records = recordService.findAllRecords();
 
         return ResponseEntity.ok(records);
+    }
+    // GET: Para obtener todos los registros de un paciente
+    @GetMapping("/patient/{username}")
+    public ResponseEntity<List<AnxietyRecordDTO>> getRecordsByPatient(@PathVariable String username) {
+        return ResponseEntity.ok(recordService.findRecordsByPatient(username));
+    }
+
+    @GetMapping("/clinic/{clinicId}")
+    public ResponseEntity<List<AnxietyRecordDTO>> getRecordsByClinic(@PathVariable Long clinicId) {
+        return ResponseEntity.ok(recordService.findRecordsByClinic(clinicId));
     }
 }

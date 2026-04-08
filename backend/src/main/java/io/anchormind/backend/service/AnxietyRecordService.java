@@ -6,4 +6,7 @@ import java.util.List;
 
 public interface AnxietyRecordService {
     List<AnxietyRecordDTO> findAllRecords();
+    List<AnxietyRecordDTO> findRecordsByPatient(String username);
+
+    List<AnxietyRecordDTO> findRecordsByClinic(Long clinicId);
 }
