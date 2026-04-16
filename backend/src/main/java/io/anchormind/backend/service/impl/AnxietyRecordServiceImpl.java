@@ -5,6 +5,7 @@ import io.anchormind.backend.dto.UserDTO;
 import io.anchormind.backend.model.entity.AnxietyRecord;
 import io.anchormind.backend.repository.AnxietyRecordRepository;
 import io.anchormind.backend.repository.ClinicRepository;
+import io.anchormind.backend.repository.UserRepository;
 import io.anchormind.backend.service.AnxietyRecordService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class AnxietyRecordServiceImpl implements AnxietyRecordService {
 
     private final AnxietyRecordRepository recordRepository;
     private final ClinicRepository clinicRepository;
+    private final UserRepository userRepository;
 
 
     @Override

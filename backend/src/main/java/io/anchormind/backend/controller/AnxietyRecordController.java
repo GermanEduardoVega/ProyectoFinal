@@ -1,7 +1,7 @@
 package io.anchormind.backend.controller;
 
 import io.anchormind.backend.dto.AnxietyRecordDTO;
-import io.anchormind.backend.service.AIServiceR;
+import io.anchormind.backend.service.AIService;
 import io.anchormind.backend.service.AnxietyRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ public class AnxietyRecordController {
 
     // Marcamos como 'final' para que RequiredArgsConstructor los inyecte automáticamente
     private final AnxietyRecordService recordService; // Final = Inmutable
-    private final AIServiceR aiService;
+    private final AIService aiService;
 
 
     // POST: Para recibir un nuevo registro desde el Front

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class AIServiceR {
+public class AIService {
     @Autowired
     private AnxietyRecordRepository anxietyRepository;
 
@@ -35,7 +35,7 @@ public class AIServiceR {
     private final ObjectMapper objectMapper;
 
     // Inyectamos el ObjectMapper que ya trae Spring Boot por defecto
-    public AIServiceR(WebClient.Builder webClientBuilder, ObjectMapper objectMapper) {
+    public AIService(WebClient.Builder webClientBuilder, ObjectMapper objectMapper) {
         this.webClient = webClientBuilder.build();
         this.objectMapper = objectMapper;
     }
@@ -45,7 +45,7 @@ public class AIServiceR {
     private static final String GEMINI_PATH = "/v1beta/models/gemini-2.5-flash:generateContent";
     @Value("${GEMINI_API_KEY}")
     private String apiKey;
-    private static final Logger log = LoggerFactory.getLogger(AIServiceR.class);
+    private static final Logger log = LoggerFactory.getLogger(AIService.class);
 
 
     public AIAnalysisResponse getAnalysisFromAI(String userSentimentText) {
