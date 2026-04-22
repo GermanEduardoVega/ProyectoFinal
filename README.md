@@ -4,8 +4,7 @@ App para el proyecto final
 # ⚓ AnchorMind Pro - Sistema de Apoyo Emocional con IA
 
 Plataforma integral diseñada para la gestión, seguimiento y análisis de episodios de ansiedad, utilizando modelos de procesamiento de lenguaje natural para brindar soporte personalizado y trazabilidad clínica.
-
-# 🚀 Estado del Proyecto: Fase 5 (Lógica de Negocio & Desacoplamiento DTO)
+# 🚀 Estado del Proyecto: Fase 8 (Gestión de Identidad & Mappers Jerárquicos)
 El sistema ha alcanzado una madurez arquitectónica superior mediante la implementación del patrón DTO (Data Transfer Objects) y la separación estricta de responsabilidades. Se ha eliminado la exposición de entidades JPA, garantizando transacciones seguras y respuestas de IA enriquecidas con protocolos de acción terapéutica.
 
 ### 🛠️ Stack Tecnológico
@@ -17,6 +16,7 @@ El sistema ha alcanzado una madurez arquitectónica superior mediante la impleme
 * **Persistencia:**  Spring Data JPA + Hibernate (modo validate)
 * **Mapeo:** Arquitectura Manual de DTOs para control total de la carga perezosa (Lazy).
 * **Productividad:** Lombok (@RequiredArgsConstructor, @Data, @Getter)
+* **Mapeo:** Arquitectura de Mappers Componentizados (Inyección de mappers para objetos anidados).
 
 ---
 
@@ -86,6 +86,43 @@ El sistema implementa una Arquitectura Multicapa para garantizar el desacoplamie
 * **Refactorización de Controladores:** Migración hacia el uso de ResponseEntity y eliminación de inyecciones de campo (@Autowired) en favor de la inyección por constructor, siguiendo las mejores prácticas de Spring.
 
 * **Manejo de Tipos Complejos:** Sincronización exitosa de arrays de strings (text[]) de PostgreSQL con colecciones de Java para los pasos de acción.
+
+### ✅ Fase 6: Inicialización y Consistencia de Datos
+* Data Seeding Profesional: Implementación de un escenario multi-clínica mediante CommandLineRunners para garantizar datos de prueba consistentes en cada arranque.
+
+* Validación de Existencia: Lógica de pre-verificación para evitar la duplicidad de registros base (testUser1, testUser2, etc.) durante el despliegue.
+
+* Integridad Referencial: Consolidación de las relaciones entre usuarios, clínicas y registros de ansiedad en el entorno de desarrollo.
+
+### ✅ Fase 7: Blindaje del Sistema (Global Exception Handling)
+* El Escudo Arquitectónico: Implementación de un @ControllerAdvice centralizado para capturar y estandarizar errores en toda la API.
+
+* Normalización de Respuestas de Error: Creación de una estructura ErrorResponse uniforme (timestamp, status, error, message, path) para mejorar la experiencia de consumo del Frontend.
+
+* Manejo de Excepciones Específicas: * Captura de EntityNotFoundException para recursos inexistentes (HTTP 404).
+
+- Gestión de IllegalArgumentException para errores de validación de negocio (HTTP 400).
+
+- Control genérico de excepciones para evitar fugas de información técnica en errores 500.
+
+### ✅ Fase 8: Gestión de Identidad y Flujo de Usuario (Actual)
+* Expansión del Perfil de Usuario: Evolución de la entidad User para incluir campos críticos: fullName, email, password y createdAt.
+
+* Control de Versiones de DB (Flyway V3 & V4): * V3: Migración manual para detalles de perfil.
+
+- V4: Incorporación de columna de credenciales (password).
+
+- Resolución de Conflictos: Sincronización técnica exitosa entre Hibernate (modo validate) y Flyway mediante técnicas de baseline manual y gestión de checksums.
+
+* Arquitectura de Mappers Jerárquicos:
+
+- Creación de UserMapper y AnxietyRecordMapper como componentes Spring (@Component).
+
+- Implementación de Inyección de Dependencias entre Mappers: AnxietyRecordMapper ahora delega el procesamiento del usuario a su respectivo experto, eliminando duplicidad de código.
+
+* Ciclo de Creación (POST): Implementación del flujo completo de registro de usuarios utilizando un UserCreateDTO específico, garantizando que el createdAt se gestione automáticamente mediante @PrePersist.
+
+* Validación de Negocio Preventiva: El servicio ahora valida la unicidad del username y email antes de intentar la persistencia, disparando excepciones controladas.
 
 [!IMPORTANT]
 Logro Arquitectónico: El sistema ahora es "Type Safe". La base de datos puede evolucionar independientemente de la API pública gracias al mapeo manual de DTOs.
