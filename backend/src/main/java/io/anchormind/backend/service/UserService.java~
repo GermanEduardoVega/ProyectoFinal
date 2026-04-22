@@ -31,17 +31,6 @@ public class UserService {
 
 @Transactional
     public UserDTO create(UserCreateDTO dto){
-    // 1. Validar si el username ya está en uso
-    if (userRepository.findActiveByUsername(dto.username()).isPresent()) {
-        throw new IllegalArgumentException("El nombre de usuario '" + dto.username() + "' ya existe.");
-    }
-
-    // 2. Validar si el email ya está en uso (Agregá este método a tu UserRepository si no lo tenés)
-    if (userRepository.existsByEmail(dto.email())) {
-        throw new IllegalArgumentException("El email '" + dto.email() + "' ya está registrado.");
-    }
-
-    // 3. Si todo está bien, procedemos
         User user = userMapper.toEntity(dto);
         User savedUser = userRepository.save(user);
         return userMapper.toDTO(savedUser);

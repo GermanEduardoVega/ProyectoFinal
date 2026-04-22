@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -22,6 +24,20 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(unique = true)
+    private String email;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+
+
     @Enumerated(EnumType.STRING)
     //sugiere que el campo se almacene como un String es decir un VARCHAR y no como un INTEGER
     @Column(nullable = false)
@@ -32,10 +48,15 @@ public class User {
 
     // Regla de desarrollo: Baja Lógica
     @Column(nullable = false)
-    private Boolean active = true;
+    private boolean active = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     //No queremos que cada vez que busques un usuario, Hibernate traiga todos los datos de la clínica de forma obligatoria. Solo los traerá si haces user.getClinic(). Esto optimiza la memoria de tu backend.
     @JoinColumn(name = "clinic_id")
     private Clinic clinic;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

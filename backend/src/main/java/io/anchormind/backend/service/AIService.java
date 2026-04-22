@@ -4,7 +4,7 @@ package io.anchormind.backend.service;
 import io.anchormind.backend.dto.AIAnalysisResponse;
 import io.anchormind.backend.dto.AnxietyRecordDTO;
 import io.anchormind.backend.dto.GeminiResponse;
-import io.anchormind.backend.dto.UserDTO;
+import io.anchormind.backend.mapper.AnxietyRecordMapper;
 import io.anchormind.backend.model.entity.AnxietyRecord;
 import io.anchormind.backend.model.entity.User;
 import io.anchormind.backend.repository.AnxietyRecordRepository;
@@ -34,10 +34,13 @@ public class AIService {
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
 
+    private final AnxietyRecordMapper recordMapper;
+
     // Inyectamos el ObjectMapper que ya trae Spring Boot por defecto
-    public AIService(WebClient.Builder webClientBuilder, ObjectMapper objectMapper) {
+    public AIService(WebClient.Builder webClientBuilder, ObjectMapper objectMapper, AnxietyRecordMapper recordMapper) {
         this.webClient = webClientBuilder.build();
         this.objectMapper = objectMapper;
+        this.recordMapper = recordMapper;
     }
 
     // Constantes para evitar "Magic Strings"
@@ -150,36 +153,10 @@ public class AIService {
         AnxietyRecord savedRecord = anxietyRepository.save(record);
 
         // E. TRADUCCIÓN (Convertimos la entidad guardada en el DTO que prometimos)
-        return mapToDTO(savedRecord);
+
+        return recordMapper.toDTO(savedRecord);
+
     }
 
-    private AnxietyRecordDTO mapToDTO(AnxietyRecord entity) {
-        // 1. Extraemos el nombre de la clínica navegando por el grafo de objetos
-        // Esto funciona porque estamos dentro de la transacción del Service
-        String clinicName = (entity.getUser().getClinic() != null)
-                ? entity.getUser().getClinic().getName()
-                : "Sin Clínica Asignada";
 
-        // 2. Creamos el UserDTO (el "paquete" de datos del usuario)
-        UserDTO userDTO = new UserDTO(
-                entity.getUser().getId(),
-                entity.getUser().getUsername(),
-                entity.getUser().getRole().toString(),
-                clinicName
-        );
-
-        // 3. Creamos y devolvemos el DTO principal
-        return new AnxietyRecordDTO(
-                entity.getId(),
-                entity.getTimeStamp(),
-                entity.getRawInput(),
-                entity.getAnxietyLevel(),
-                entity.getTriggerIdentified(),
-                entity.getTechnique(),
-                entity.getApplicability(),
-                entity.getAwarenessMessage(),
-                entity.getActionSteps(),
-                userDTO
-        );
-    }
 }
