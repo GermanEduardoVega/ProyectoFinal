@@ -29,7 +29,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("El usuario '" + username + "' no existe o está inactivo."));
     }
 
-@Transactional
+    @Transactional
     public UserDTO create(UserCreateDTO dto){
     // 1. Validar si el username ya está en uso
     if (userRepository.findActiveByUsername(dto.username()).isPresent()) {

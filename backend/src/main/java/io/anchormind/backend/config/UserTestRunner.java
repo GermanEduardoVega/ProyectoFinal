@@ -1,6 +1,7 @@
 package io.anchormind.backend.config;
 
 import io.anchormind.backend.model.entity.User;
+import io.anchormind.backend.model.entity.User;
 import io.anchormind.backend.model.enums.Role;
 import io.anchormind.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

@@ -24,9 +24,9 @@ El sistema ha alcanzado una madurez arquitectónica superior mediante la impleme
 El sistema implementa una Arquitectura Multicapa para garantizar el desacoplamiento:
 
 1.  **Capa de Presentación (REST Controllers):** Maneja únicamente DTOs. Inyección de dependencias por constructor para máxima testeabilidad.
-2.  **Capa de Servicio (Business Logic):**Orquestación de procesos. Uso de @Transactional para gestionar la persistencia y la hidratación de objetos relacionados.
+2.  **Capa de Servicio (Business Logic):** Orquestación de procesos. Uso de @Transactional para gestionar la persistencia y la hidratación de objetos relacionados.
 3.  **Capa de Dominio (Entities):** Modelos JPA que representan fielmente las tablas de PostgreSQL, protegidos tras la capa de servicio.
-4.  **Capa de Transferencia (DTOs/Records):**Objetos inmutables que definen el contrato de comunicación con el Frontend, evitando la recursión infinita y errores de sesión.
+4.  **Capa de Transferencia (DTOs/Records):** Objetos inmutables que definen el contrato de comunicación con el Frontend, evitando la recursión infinita y errores de sesión.
 ---
 
 ## 📋 Bitácora de Logros (Log de Progreso)
