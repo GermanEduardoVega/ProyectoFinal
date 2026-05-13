@@ -105,7 +105,7 @@ El sistema implementa una Arquitectura Multicapa para garantizar el desacoplamie
 
 - Control genérico de excepciones para evitar fugas de información técnica en errores 500.
 
-### ✅ Fase 8: Gestión de Identidad y Flujo de Usuario (Actual)
+### ✅ Fase 8: Gestión de Identidad y Flujo de Usuario 
 * Expansión del Perfil de Usuario: Evolución de la entidad User para incluir campos críticos: fullName, email, password y createdAt.
 
 * Control de Versiones de DB (Flyway V3 & V4): * V3: Migración manual para detalles de perfil.
@@ -126,6 +126,69 @@ El sistema implementa una Arquitectura Multicapa para garantizar el desacoplamie
 
 [!IMPORTANT]
 Logro Arquitectónico: El sistema ahora es "Type Safe". La base de datos puede evolucionar independientemente de la API pública gracias al mapeo manual de DTOs.
+
+
+
+### ✅ Fase 9: Arquitectura Genérica, Desacoplamiento y Herencia de Estado
+El sistema ha sido refactorizado bajo un estándar de ingeniería superior, implementando una estructura basada en Interfaces y Genéricos. Esta arquitectura permite que cada componente sea extensible y mantenga responsabilidades claramente definidas, facilitando la escalabilidad del backend.
+
+
+🏗️ Arquitectura de Base Genérica y Desacoplada
+*   Jerarquía de Clases Base: Implementación de BaseRepository, BaseService y BaseController genéricos. Esta estructura permite que los métodos CRUD estándar sean heredados, asegurando que cada clase hija (AnxietyRecord, User, Clinic) implemente únicamente la lógica específica que corresponde a su dominio.
+
+*   Inyección por Interfaz (DIP): Se aplicó el principio de inversión de dependencias, inyectando interfaces (ej. UserService) en lugar de implementaciones concretas. Esto desacopla la capa de presentación de la lógica interna, permitiendo cambiar la implementación sin afectar los controladores.
+
+*   Versionamiento de API: Adopción sistemática del prefijo /api/v1/ para todos los controladores, garantizando estabilidad en los contratos y profesionalismo en la exposición de recursos.
+
+🛡️ Herencia de Identidad y Blindaje de Datos (BaseEntity)
+*   Herencia con @SuperBuilder: Se reemplazó @Builder por @SuperBuilder de forma transversal. Esto es fundamental para que los Builders de las clases hijas puedan heredar y configurar correctamente los atributos de BaseEntity (como id y active).
+
+*   Garantía de Estado con @Builder.Default: Se aplicó esta anotación sobre el campo private boolean active = true; en la clase padre. Esto asegura que el patrón Builder respete el valor inicial y no asigne false por defecto, protegiendo la regla de negocio donde cada entidad nace "activa".
+
+*   Sincronización Flyway-Hibernate: Dado que Hibernate opera en modo validate, se coordinó mediante migraciones de Flyway la existencia de la columna active en todas las tablas, evitando errores de validación al heredar atributos comunes.
+
+🔄 Optimización de Mappers y JSON (Jackson/Lombok)
+*   Resolución de Conflictos de Instanciación: Se combinaron @NoArgsConstructor y @AllArgsConstructor para que Jackson pueda instanciar objetos mediante el constructor vacío (necesario para procesar JSON) sin perder las ventajas de @SuperBuilder.
+
+*   Mappers Componentizados: Los mappers ahora actúan como componentes de Spring, permitiendo que AnxietyRecordMapper delegue responsabilidades a otros mappers expertos para manejar objetos anidados de forma limpia.
+
+## 🚀 Estado de Endpoints (v1)
+🏥 Anxiety Records (Análisis e Historial)
+
+
+| Método  | 	    Endpoint                        | 	                Descripción                               | 	Estado     |
+|:--------|:-------------------------------------|:-----------------------------------------------------------|:------------|
+| **POST**	   | `/api/v1/anxiety-records`	             | Analiza con IA y persiste un registro limpio usando DTO.	  | TERMINADO ✅ |
+| **GET**	    | `/api/v1/anxiety-records/patient/{u}`	 | Historial cronológico (JPQL) filtrado por usuario activo.	 | TERMINADO ✅ |
+| **GET**	    | `/api/v1/anxiety-records/clinic/{id}`	 | Registros agrupados por institución.	                      | TERMINADO ✅ |
+| **GET**	    | `/api/v1/anxiety-records/stats/{u}`	   | Evolución semanal de niveles de ansiedad.	                 | PENDIENTE ⏳ |
+| **DELETE**	 | `/api/v1/anxiety-records/{id}`	        | Eliminación lógica del registro (Safe Delete).	            | PENDIENTE ⏳ |
+
+👤 User Management (Identidad)
+
+| Método | 	Endpoint                 | 	Descripción                                       | 	Estado     |
+|:-------|:--------------------------|:---------------------------------------------------|:------------| 
+| **GET**    | 	`/api/v1/users/{username}` | 	Obtención de perfil activo.	                      | TERMINADO ✅ |
+| **POST**   | 	`/api/v1/users`            | 	Registro de usuarios con validación de unicidad.	 | TERMINADO ✅ |
+| **PUT**    | 	`/api/v1/users/{id}`       | 	Actualización de perfil (Full Name, Email).	      | PENDIENTE ⏳ |
+| **DELETE** | 	`/api/v1/users/{id}`       | 	Desactivación de cuenta (active = false).         | TERMINADO ✅ |
+
+🏥 Clínica (Gestión Institucional)
+
+| Método | Endpoint             | Descripción                                                     | Estado      |
+|:-------|:---------------------|:----------------------------------------------------------------|:------------|
+| **GET**    | `/api/v1/clinics`      | Obtener listado de todas las clínicas activas.                  | TERMINADO ✅ |
+| **GET**    | `/api/v1/clinics/{id}` | Obtener detalle de una clínica específica por su ID.            | TERMINADO ✅ |  
+| **POST**   | `/api/v1/clinics`      | Alta de nueva institución (solo accesible por administradores). | TERMINADO ✅ | 
+| **PUT**    | `/api/v1/clinics/{id}` | Actualización de datos institucionales.                         | PENDIENTE ⏳ | 
+| **DELETE** | `/api/v1/clinics/{id}` | Desactivación de clínica (Safe Delete).                         | PENDIENTE ⏳ |          
+[!IMPORTANT]
+Logro Arquitectónico: El sistema es ahora completamente "Type Safe" y desacoplado. La implementación de la base genérica permite extender el sistema a nuevas entidades (ej: Medicación, Turnos) en cuestión de minutos, heredando toda la potencia del CRUD y el Soft Delete ya configurado.
+
+
+
+
+
 
 ---
 
