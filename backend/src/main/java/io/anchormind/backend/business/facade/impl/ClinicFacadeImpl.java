@@ -1,7 +1,7 @@
 package io.anchormind.backend.business.facade.impl;
 
-import io.anchormind.backend.business.facade.BaseFacade;
-import io.anchormind.backend.business.facade.BaseFacadeImpl;
+import io.anchormind.backend.business.facade.base.BaseFacade;
+import io.anchormind.backend.business.facade.base.BaseFacadeImpl;
 import io.anchormind.backend.business.mapper.ClinicMapper;
 import io.anchormind.backend.business.services.ClinicService;
 import io.anchormind.backend.domain.dto.ClinicDTO;

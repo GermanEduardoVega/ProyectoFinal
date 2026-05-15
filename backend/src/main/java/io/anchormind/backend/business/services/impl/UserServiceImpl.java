@@ -5,7 +5,9 @@ import io.anchormind.backend.business.services.base.BaseServiceImpl;
 import io.anchormind.backend.domain.dto.UserCreateDTO;
 import io.anchormind.backend.domain.dto.UserDTO;
 import io.anchormind.backend.business.mapper.UserMapper;
+import io.anchormind.backend.domain.entities.Clinic;
 import io.anchormind.backend.domain.entities.User;
+import io.anchormind.backend.repositories.ClinicRepository;
 import io.anchormind.backend.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +19,16 @@ import java.util.Optional;
 public class UserServiceImpl extends BaseServiceImpl<User, Long> implements UserService {
 
     private final UserRepository userRepository;
+    private final ClinicRepository clinicRepository; // Necesario para validar la clínica
     private final UserMapper userMapper;
 
     //El constructor manual de inyección de dependencias
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository,
+                           ClinicRepository clinicRepository,
+                           UserMapper userMapper) {
         super(userRepository);
         this.userRepository = userRepository;
+        this.clinicRepository = clinicRepository;
         this.userMapper = userMapper;
     }
 
@@ -36,21 +42,28 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
                 .map(userMapper::toDTO)
                 .orElseThrow(() -> new EntityNotFoundException("El usuario '" + username + "' no existe o está inactivo."));
     }
-
+    @Override
     @Transactional
     public UserDTO create(UserCreateDTO dto){
-    // 1. Validar si el username ya está en uso
-    if (userRepository.findActiveByUsername(dto.username()).isPresent()) {
-        throw new IllegalArgumentException("El nombre de usuario '" + dto.username() + "' ya existe.");
-    }
+        // 1. Validaciones de unicidad
+        if (userRepository.findActiveByUsername(dto.username()).isPresent()) {
+            throw new IllegalArgumentException("El nombre de usuario '" + dto.username() + "' ya existe.");
+        }
 
-    // 2. Validar si el email ya está en uso (Agregá este método a tu UserRepository si no lo tenés)
-    if (userRepository.existsByEmail(dto.email())) {
-        throw new IllegalArgumentException("El email '" + dto.email() + "' ya está registrado.");
-    }
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new IllegalArgumentException("El email '" + dto.email() + "' ya está registrado.");
+        }
 
-    // 3. Si todo está bien, procedemos
+        // 2. Validaciones de clínica
+        Clinic clinic = clinicRepository.findById(dto.clinicId())
+                .orElseThrow(() -> new IllegalArgumentException("La clínica con ID " + dto.clinicId() + " no existe."));
+
+
+        // 3. Mapeo y asignación manual del vínculo todo correcto
         User user = userMapper.toEntity(dto);
+        user.setClinic(clinic); // Aquí "atamos" el usuario a la clínica
+
+        // 4. Persistencia
         User savedUser = userRepository.save(user);
         return userMapper.toDTO(savedUser);
     }

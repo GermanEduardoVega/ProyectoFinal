@@ -1,5 +1,6 @@
-package io.anchormind.backend.business.facade;
+package io.anchormind.backend.business.facade.base;
 
+import io.anchormind.backend.business.facade.base.BaseFacade;
 import io.anchormind.backend.business.services.base.BaseService;
 
 import java.io.Serializable;

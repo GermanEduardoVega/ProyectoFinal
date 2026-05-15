@@ -3,16 +3,18 @@ package io.anchormind.backend.business.mapper;
 import io.anchormind.backend.domain.dto.UserCreateDTO;
 import io.anchormind.backend.domain.dto.UserDTO;
 import io.anchormind.backend.domain.entities.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class UserMapper {
 
 
     public UserDTO toDTO(User user) {
         if (user == null) return null;
 
-        String clinic = (user.getClinic() != null) ? user.getClinic().getName() : "Sin Clínica";
+        String clinicName = (user.getClinic() != null) ? user.getClinic().getName() : "Sin Clínica";
 
         return new UserDTO(
                 user.getId(),
@@ -20,7 +22,7 @@ public class UserMapper {
                 user.getFullName(),
                 user.getEmail(),
                 user.getRole().name(),
-                clinic,
+                clinicName,
                 user.isActive(),
                 user.getCreatedAt()
         );
@@ -36,6 +38,8 @@ public class UserMapper {
         user.setEmail(dto.email());
         user.setRole(dto.role());
         user.setActive(true);
+
+        // El vínculo con la clínica se hará en el Service antes de guardar
         return user;
     }
 }

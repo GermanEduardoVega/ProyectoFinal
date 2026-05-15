@@ -7,5 +7,7 @@ public record UserCreateDTO(
         String password,
         String fullName,
         String email,
-        Role role // Ej: "PATIENT" o "ADMIN"
+        Role role, // Ej: "PATIENT" o "ADMIN"
+
+        Long clinicId // Solo el ID para vincularlo
 ) {}

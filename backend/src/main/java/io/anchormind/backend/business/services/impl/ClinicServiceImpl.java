@@ -1,5 +1,6 @@
 package io.anchormind.backend.business.services.impl;
 
+import io.anchormind.backend.business.mapper.ClinicMapper;
 import io.anchormind.backend.business.services.ClinicService;
 import io.anchormind.backend.business.services.base.BaseServiceImpl;
 import io.anchormind.backend.domain.dto.ClinicDTO;
@@ -15,10 +16,12 @@ public class ClinicServiceImpl extends BaseServiceImpl<Clinic, Long> implements 
 
     // Inyectamos el repositorio específico para acceder a los métodos de búsqueda por estado
     private final ClinicRepository clinicRepository;
+    private final ClinicMapper clinicMapper;
 
-    public ClinicServiceImpl(ClinicRepository clinicRepository) {
+    public ClinicServiceImpl(ClinicRepository clinicRepository,ClinicMapper clinicMapper) {
         super(clinicRepository); // Pasamos el repo específico a la clase base
         this.clinicRepository = clinicRepository;
+        this.clinicMapper = clinicMapper;
     }
 
     @Override
@@ -26,7 +29,7 @@ public class ClinicServiceImpl extends BaseServiceImpl<Clinic, Long> implements 
     public List<ClinicDTO> findAllActiveDTO() {
         // Usamos el nombre exacto que definiste en tu Repository: findAllByActiveTrue
         return clinicRepository.findAllByActiveTrue().stream()
-                .map(this::toDTO) // Convertimos a DTO plano antes de cerrar la sesión
+                .map(clinicMapper::toDTO) // Convertimos a DTO plano antes de cerrar la sesión
                 .toList();
     }
 
@@ -35,34 +38,16 @@ public class ClinicServiceImpl extends BaseServiceImpl<Clinic, Long> implements 
     @Override
     @Transactional
     public ClinicDTO createClinic(ClinicDTO dto) throws Exception {
-        // Nivel 1: Validación contra la DB (Nombre único)
+        // Validación de nombre único entre las activas
         if (clinicRepository.findByNameIgnoreCaseAndActiveTrue(dto.name()).isPresent()) {
             throw new Exception("La clínica '" + dto.name() + "' ya se encuentra registrada.");
         }
 
-        // Nivel 2: Si recibieras una lista (HashSet), esto asegura que no haya duplicados en el lote
-        // Set<ClinicDTO> clinicSet = new HashSet<>(listaRecibida);
+        // Usamos el mapper para crear una entidad limpia
+        Clinic clinic = clinicMapper.toEntity(dto);
 
-        Clinic clinic = Clinic.builder()
-                .name(dto.name())
-                .address(dto.address())
-                .phone(dto.phone())
-                .active(true)
-                .build();
-
-        return toDTO(this.save(clinic));
-    }
-
-    // Mapper manual que evita cargar la colección perezosa de usuarios
-    private ClinicDTO toDTO(Clinic clinic) {
-        return new ClinicDTO(
-                clinic.getId(),
-                clinic.getName(),
-                clinic.getAddress(),
-                clinic.getPhone(),
-                clinic.isActive(),
-                clinic.getCreatedAt()
-        );
+        // El save devuelve la entidad con ID y CreatedAt generados por la DB
+        return clinicMapper.toDTO(this.save(clinic));
     }
 
     @Override
@@ -70,7 +55,7 @@ public class ClinicServiceImpl extends BaseServiceImpl<Clinic, Long> implements 
     public ClinicDTO findActiveByIdDTO(Long id) throws Exception {
         Clinic clinic = clinicRepository.findById(id)
                 .orElseThrow(() -> new Exception("Clínica no encontrada"));
-        return toDTO(clinic);
+        return clinicMapper.toDTO(clinic);
     }
 
     @Override
@@ -78,34 +63,30 @@ public class ClinicServiceImpl extends BaseServiceImpl<Clinic, Long> implements 
     public ClinicDTO findActiveByNameDTO(String name) throws Exception {
         Clinic clinic = clinicRepository.findByNameIgnoreCaseAndActiveTrue(name)
                 .orElseThrow(() -> new Exception("Clínica no encontrada"));
-        return toDTO(clinic);
+        return clinicMapper.toDTO(clinic);
     }
 
     @Override
     @Transactional
     public ClinicDTO updateInstitutionalData(Long id, ClinicDTO dto) throws Exception {
-        // 1. Buscamos la clínica existente
+        // 1. Buscamos la clínica existente (Estado gestionado por Hibernate)
         Clinic clinic = clinicRepository.findById(id)
                 .orElseThrow(() -> new Exception("No se encontró la clínica con ID: " + id));
 
-        // 2. Actualizamos solo los campos permitidos
-        clinic.setName(dto.name());
-        clinic.setAddress(dto.address());
-        clinic.setPhone(dto.phone());
+        // 2. Usamos el método de actualización selectiva del Mapper
+        clinicMapper.updateInstitutionalDataFromDTO(dto, clinic);
 
-        // 3. Guardamos y devolvemos el DTO
-        return toDTO(clinicRepository.save(clinic));
+        // 3. Guardamos los cambios
+        return clinicMapper.toDTO(clinicRepository.save(clinic));
     }
 
     @Override
     @Transactional
     public boolean delete(Long id) throws Exception {
-        // Usamos clinicRepository. Ambos apuntan al mismo bean de Spring,
-        // pero el específico es más coherente con tu nueva arquitectura.
         Clinic clinic = clinicRepository.findById(id)
                 .orElseThrow(() -> new Exception("Clínica no encontrada"));
 
-        clinic.setActive(false); // Tu lógica de borrado lógico se mantiene intacta
+        clinic.setActive(false); // Borrado lógico
         clinicRepository.save(clinic);
         return true;
     }
