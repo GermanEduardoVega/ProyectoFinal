@@ -25,8 +25,8 @@ public class AnxietyRecordController {
     @PostMapping
     public ResponseEntity<AnxietyRecordDTO> createRecord(
             @Valid @RequestBody AnxietyRecordRequestDTO requestDTO,
-            @RequestParam String username)
-    {
+            @RequestParam String username) {
+
         // El controlador solo le pide al servicio de registros que haga su trabajo
         AnxietyRecordDTO response = recordService.analyzeAndSave(requestDTO.getRawInput(), username);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -35,6 +35,7 @@ public class AnxietyRecordController {
     // GET: Para obtener todos los registros
     @GetMapping
     public ResponseEntity<List<AnxietyRecordDTO>> getAllRecords() {
+
         List<AnxietyRecordDTO> records = recordService.findAllRecords();
 
         return ResponseEntity.ok(records);
@@ -43,6 +44,7 @@ public class AnxietyRecordController {
     // GET: Para obtener todos los registros de un paciente
     @GetMapping("/patient/{username}")
     public ResponseEntity<List<AnxietyRecordDTO>> getRecordsByPatient(@PathVariable String username) {
+
         List<AnxietyRecordDTO> records = recordService.findRecordsByPatient(username);
         return ResponseEntity.ok(records);
     }
@@ -51,6 +53,7 @@ public class AnxietyRecordController {
     // GET: Para obtener todos los registros de una clínica
     @GetMapping("/clinic/{clinicId}")
     public ResponseEntity<List<AnxietyRecordDTO>> getRecordsByClinic(@PathVariable Long clinicId) {
+        
         return ResponseEntity.ok(recordService.findRecordsByClinic(clinicId));
     }
 }
