@@ -1,5 +1,6 @@
 package io.anchormind.backend.presentation.rest;
 
+import io.anchormind.backend.business.facade.AnxietyRecordFacade;
 import io.anchormind.backend.domain.dto.AnxietyRecordDTO;
 import io.anchormind.backend.business.services.AIService;
 import io.anchormind.backend.business.services.AnxietyRecordService;
@@ -14,12 +15,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/anxiety-records")// La URL base
-@RequiredArgsConstructor
 public class AnxietyRecordController {
 
     // Marcamos como 'final' para que RequiredArgsConstructor los inyecte automáticamente
-    private final AnxietyRecordService recordService; // Final = Inmutable
-    private final AIService aiService;
+
+    private final AnxietyRecordFacade recordFacade;
+
+    public AnxietyRecordController(AnxietyRecordFacade recordFacade) {
+        this.recordFacade = recordFacade;
+    }
 
     // POST: Para recibir un nuevo registro desde el Front
     @PostMapping
@@ -28,15 +32,15 @@ public class AnxietyRecordController {
             @RequestParam String username) {
 
         // El controlador solo le pide al servicio de registros que haga su trabajo
-        AnxietyRecordDTO response = recordService.analyzeAndSave(requestDTO.getRawInput(), username);
+        AnxietyRecordDTO response = recordFacade.analyzeAndSave(requestDTO.getRawInput(), username);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // GET: Para obtener todos los registros
     @GetMapping
-    public ResponseEntity<List<AnxietyRecordDTO>> getAllRecords() {
+    public ResponseEntity<List<AnxietyRecordDTO>> getAllRecords() throws Exception {
 
-        List<AnxietyRecordDTO> records = recordService.findAllRecords();
+        List<AnxietyRecordDTO> records = recordFacade.findAllRecords();
 
         return ResponseEntity.ok(records);
     }
@@ -45,7 +49,7 @@ public class AnxietyRecordController {
     @GetMapping("/patient/{username}")
     public ResponseEntity<List<AnxietyRecordDTO>> getRecordsByPatient(@PathVariable String username) {
 
-        List<AnxietyRecordDTO> records = recordService.findRecordsByPatient(username);
+        List<AnxietyRecordDTO> records = recordFacade.findRecordsByPatient(username);
         return ResponseEntity.ok(records);
     }
 
@@ -54,6 +58,6 @@ public class AnxietyRecordController {
     @GetMapping("/clinic/{clinicId}")
     public ResponseEntity<List<AnxietyRecordDTO>> getRecordsByClinic(@PathVariable Long clinicId) {
         
-        return ResponseEntity.ok(recordService.findRecordsByClinic(clinicId));
+        return ResponseEntity.ok(recordFacade.findRecordsByClinic(clinicId));
     }
 }
