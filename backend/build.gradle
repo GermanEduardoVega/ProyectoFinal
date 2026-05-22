@@ -32,6 +32,9 @@ dependencies {
 	// El driver de Postgres que ya tienes
 	runtimeOnly 'org.postgresql:postgresql'
 
+	// Spring Security Starter para cifrado y protección de endpoints
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'

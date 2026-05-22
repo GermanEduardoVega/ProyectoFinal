@@ -11,6 +11,7 @@ import io.anchormind.backend.repositories.ClinicRepository;
 import io.anchormind.backend.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,15 +22,18 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
     private final UserRepository userRepository;
     private final ClinicRepository clinicRepository; // Necesario para validar la clínica
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     //El constructor manual de inyección de dependencias
     public UserServiceImpl(UserRepository userRepository,
                            ClinicRepository clinicRepository,
-                           UserMapper userMapper) {
+                           UserMapper userMapper,
+                           PasswordEncoder passwordEncoder) {
         super(userRepository);
         this.userRepository = userRepository;
         this.clinicRepository = clinicRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<User> getUserByUsername(String username){
@@ -59,14 +63,20 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
                 .orElseThrow(() -> new IllegalArgumentException("La clínica con ID " + dto.clinicId() + " no existe."));
 
 
-        // 3. Mapeo y asignación manual del vínculo todo correcto
+        // 3. Mapeo a entidad
         User user = userMapper.toEntity(dto);
         user.setClinic(clinic); // Aquí "atamos" el usuario a la clínica
 
-        // 4. Persistencia
+        // 4. Bycript del password
+        // Tomamos la clave en texto plano del DTO, la hacheamos y la seteamos en la entidad
+        String passwordHashed = passwordEncoder.encode(dto.password());
+        user.setPassword(passwordHashed);
+
+        // 5. Persistencia
         User savedUser = userRepository.save(user);
         return userMapper.toDTO(savedUser);
     }
+
 
     @Override
     @Transactional
@@ -77,6 +87,5 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
         userRepository.save(user);
         return true;
     }
-
 
 }
