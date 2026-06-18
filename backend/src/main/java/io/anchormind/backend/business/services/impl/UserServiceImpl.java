@@ -22,21 +22,21 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
     private final UserRepository userRepository;
     private final ClinicRepository clinicRepository; // Necesario para validar la clínica
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
+    
 
     //El constructor manual de inyección de dependencias
     public UserServiceImpl(UserRepository userRepository,
                            ClinicRepository clinicRepository,
-                           UserMapper userMapper,
-                           PasswordEncoder passwordEncoder) {
+                           UserMapper userMapper
+                          ) {
         super(userRepository);
         this.userRepository = userRepository;
         this.clinicRepository = clinicRepository;
         this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
+        
     }
 
-    public Optional<User> getUserByUsername(String username){
+    public Optional<User> getUserByUsername(String username)    {
         return userRepository.findActiveByUsername(username);
     }
 
@@ -66,11 +66,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
         // 3. Mapeo a entidad
         User user = userMapper.toEntity(dto);
         user.setClinic(clinic); // Aquí "atamos" el usuario a la clínica
-
-        // 4. Bycript del password
-        // Tomamos la clave en texto plano del DTO, la hacheamos y la seteamos en la entidad
-        String passwordHashed = passwordEncoder.encode(dto.password());
-        user.setPassword(passwordHashed);
+        
 
         // 5. Persistencia
         User savedUser = userRepository.save(user);

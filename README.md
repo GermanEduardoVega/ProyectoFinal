@@ -186,10 +186,39 @@ El sistema ha sido refactorizado bajo un estándar de ingeniería superior, impl
 Logro Arquitectónico: El sistema es ahora completamente "Type Safe" y desacoplado. La implementación de la base genérica permite extender el sistema a nuevas entidades (ej: Medicación, Turnos) en cuestión de minutos, heredando toda la potencia del CRUD y el Soft Delete ya configurado.
 
 
+### ✅ Fase 10: Integración de Seguridad y Flujo de Autenticación (Auth0 + Spring Security)
+
+Para entender cómo interactúan **React (Frontend)**, **Spring Boot (Backend)** y **Auth0 (Identity Provider)** en esta etapa de arquitectura distribuida, podemos dividir el comportamiento de las peticiones en dos escenarios según el nivel de acceso configurado:
+
+1. **Rutas Públicas / Libres:** Peticiones como `POST /api/v1/users/create` son permitidas de forma directa mediante la directiva `.permitAll()` en nuestra configuración de seguridad. Esto faculta al Frontend a sincronizar y registrar el perfil local del usuario (vinculándolo a su respectiva clínica) inmediatamente después del alta en el proveedor de identidad.
+2. **Rutas Protegidas / Bloqueadas:** Endpoints críticos como el registro de logs de ansiedad (`/api/v1/anxiety-records`) o el análisis con IA requieren credenciales. Si se intenta realizar una petición sin un token válido en la cabecera, el backend interceptará la solicitud y responderá con un estado **`401 Unauthorized`**, denegando el acceso de forma segura.
+
+#### 🗺️ Mapa de Flujo de Información (OAuth2 Resource Server)
 
 
 
+El siguiente flujo describe la interacción secuencial entre los componentes del ecosistema al momento de autenticar y persistir un usuario:
 
+```text
+[ Frontend (React) ]
+         │
+         │ 1. Usuario inicia sesión / se registra en la UI de Auth0
+         ▼
+[ Servidores de Auth0 ] ──( Genera el Tenant y credenciales en la nube )
+         │
+         │ 2. Devuelve un Token JWT firmado digitalmente a React
+         ▼
+[ Frontend (React) ]
+         │
+         │ 3. Petición HTTP POST a /api/v1/users/create
+         │    incluyendo el JWT en el Header (Authorization: Bearer <token>)
+         ▼
+[ Backend (Spring Boot3 + Security) ]
+         │
+         │ 4. Valida el token contra la 'issuer-uri' (Auth0) y comprueba la 'audience'.
+         │    Si es válido, procesa la lógica de negocio en UserServiceImpl.
+         ▼
+[ Base de Datos (PostgreSQL) ] ──( Persiste la relación: User ↔ Clinic )
 ---
 
 ## ⚙️ Configuración para Desarrolladores
