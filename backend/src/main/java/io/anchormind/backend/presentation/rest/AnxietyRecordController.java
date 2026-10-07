@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class AnxietyRecordController {
 
     // POST: Para recibir un nuevo registro desde el Front
     @PostMapping
+    @PreAuthorize("hasRole('PATIENT')") // 🔒 Solo pacientes añaden registros
     public ResponseEntity<AnxietyRecordDTO> createRecord(
             @Valid @RequestBody AnxietyRecordRequestDTO requestDTO,
             @RequestParam String username) {
@@ -38,6 +40,7 @@ public class AnxietyRecordController {
 
     // GET: Para obtener todos los registros
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')") // 🔒 Solo el superadmin puede auditar todo el sistema
     public ResponseEntity<List<AnxietyRecordDTO>> getAllRecords() throws Exception {
 
         List<AnxietyRecordDTO> records = recordFacade.findAllRecords();
@@ -47,6 +50,7 @@ public class AnxietyRecordController {
 
     // GET: Para obtener todos los registros de un paciente
     @GetMapping("/patient/{username}")
+    @PreAuthorize("hasRole('PATIENT') or hasRole('PROFESSIONAL')") // 🔒 El paciente ve su historial, su terapeuta también
     public ResponseEntity<List<AnxietyRecordDTO>> getRecordsByPatient(@PathVariable String username) {
 
         List<AnxietyRecordDTO> records = recordFacade.findRecordsByPatient(username);
@@ -56,6 +60,7 @@ public class AnxietyRecordController {
 
     // GET: Para obtener todos los registros de una clínica
     @GetMapping("/clinic/{clinicId}")
+    @PreAuthorize("hasRole('CLINIC_ADMIN') or hasRole('ADMIN')") // 🔒 Profesionales o Admins ven estadísticas de clínica
     public ResponseEntity<List<AnxietyRecordDTO>> getRecordsByClinic(@PathVariable Long clinicId) {
         
         return ResponseEntity.ok(recordFacade.findRecordsByClinic(clinicId));

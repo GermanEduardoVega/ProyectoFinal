@@ -28,7 +28,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/username/{username}")
+        @GetMapping("/username/{username}")
     public ResponseEntity<?> getByUsername(@PathVariable String username) {
 
         // Este método llamará al Service que devuelve el DTO con 8 campos

@@ -7,6 +7,7 @@ import io.anchormind.backend.domain.entities.Clinic;
 import io.anchormind.backend.presentation.rest.base.BaseControllerImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,10 +24,12 @@ public class ClinicController {
      * procesada por tu ClinicServiceImpl.
      */
 
+    // Listado de Clínicas
     @GetMapping("")
+    @PreAuthorize("hasRole('CLINIC_ADMIN') or hasRole('PROFESSIONAL') or hasRole('ADMIN')")
     public ResponseEntity<?> getAll() {
         try {
-            // El service ya está disponible por la herencia de BaseControllerImpl
+
             return ResponseEntity.status(HttpStatus.OK).body(clinicFacade.findAll());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -40,6 +43,7 @@ public class ClinicController {
      * Recibimos un DTO y dejamos que el servicio especializado haga el mapeo.
      */
         @PostMapping("/create")
+        @PreAuthorize("hasRole('ADMIN')") // 🔒 Solo el superadmin del sistema puede dar de alta clínicas nuevas
         public ResponseEntity<?> create(@RequestBody ClinicDTO dto) {
         try {
             // Llamamos al método específico que creaste en ClinicServiceImpl
@@ -52,6 +56,7 @@ public class ClinicController {
 
     // Detalle por ID
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('CLINIC_ADMIN') or hasRole('PROFESSIONAL')")
     public ResponseEntity<?> getOne(@PathVariable Long id) {
         try {
             // Ahora la fachada debe tener este método o llamar al service a través de ella
@@ -75,6 +80,7 @@ public class ClinicController {
 
     // Actualización de datos institucionales
     @PutMapping("/update/{id}")
+    @PreAuthorize("hasRole('CLINIC_ADMIN')") // 🔒 Solo el administrador de dicha clínica puede editar sus datos
     public ResponseEntity<?> updateInstitutional(@PathVariable Long id, @RequestBody ClinicDTO dto) {
         try {
             // Delegamos la actualización a la fachada
@@ -91,6 +97,7 @@ public class ClinicController {
      * ejecute la desactivación y no la eliminación física.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // 🔒 Solo el superadmin puede deshabilitar una institución del sistema
     public ResponseEntity<?> delete(@PathVariable Long id) {
         try {
             // Este método en ClinicServiceImpl ya lo programamos

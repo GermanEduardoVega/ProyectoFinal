@@ -14,6 +14,7 @@ public class UserMapper {
     public UserDTO toDTO(User user) {
         if (user == null) return null;
 
+        Long clinicId = (user.getClinic() != null) ? user.getClinic().getId() : null;
         String clinicName = (user.getClinic() != null) ? user.getClinic().getName() : "Sin Clínica";
 
         return new UserDTO(
@@ -22,6 +23,7 @@ public class UserMapper {
                 user.getFullName(),
                 user.getEmail(),
                 user.getRole().name(),
+                clinicId,
                 clinicName,
                 user.isActive(),
                 user.getCreatedAt()
