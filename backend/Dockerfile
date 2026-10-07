@@ -1,33 +1,35 @@
-# ETAPA 1: Construcción con Gradle Wrapper y JDK 17
+# ETAPA 1: Construcción con Gradle
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
 
-# 1. Copiamos los archivos de Gradle primero para aprovechar la caché de Docker
+# 1. Archivos de Gradle para caché
 COPY gradlew .
 COPY gradle ./gradle
 COPY build.gradle .
 COPY settings.gradle* .
 
-# Damos permisos de ejecución al wrapper y descargamos dependencias
 RUN chmod +x ./gradlew
 RUN ./gradlew dependencies --no-daemon || true
 
-# 2. Copiamos el código fuente y generamos el bootJar omitiendo tests unitarios
+# 2. Compilación del JAR omitiendo tests
 COPY src ./src
 RUN ./gradlew bootJar --no-daemon -x test
 
-# ETAPA 2: Runtime liviano para producción
+# ETAPA 2: Runtime liviano
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Creamos un usuario sin privilegios por seguridad
+# Creamos usuario y grupo seguro
 RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
 
-# Copiamos dinámicamente cualquier JAR generado que no sea el de fuentes/plain
-COPY --from=build /app/build/libs/*[!plain].jar app.jar
+# Copiamos el JAR asignándole permisos directamente al usuario spring
+COPY --from=build --chown=spring:spring /app/build/libs/*.jar app.jar
+
+# Verificación de integridad en el build
+RUN ls -la /app/app.jar
+
+USER spring:spring
 
 EXPOSE 8080
 
-# Flags optimizados para memoria en contenedores
 ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
